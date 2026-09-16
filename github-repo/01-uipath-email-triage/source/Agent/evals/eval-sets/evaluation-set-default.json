@@ -1,0 +1,57 @@
+{
+  "fileName": "evaluation-set-default.json",
+  "id": "cc8c90e8-fff2-4da9-b2cf-e8b20ec4a783",
+  "name": "Default Evaluation Set",
+  "batchSize": 10,
+  "timeoutMinutes": 20,
+  "evaluatorRefs": [
+    "ef4ba149-559c-46fc-98ef-91522c9442dc"
+  ],
+  "evaluations": [
+    {
+      "id": "759e13e9-ba47-497e-a7fc-45a6217bf023",
+      "name": "Debug Run 9/14/2026, 4:55:38 AM",
+      "inputs": {
+        "emailContent": "From: Noor Al-Harbi <noor.alharbi@unistep.sa>\nSubject: مراجعة مسودة العقد قبل الغد\n\nالسلام عليكم،\n\nأرفقت مسودة العقد المحدثة مع المورد. نحتاج مراجعتكم للبنود الخاصة بمستويات الخدمة والجزاءات، وإرسال ملاحظاتكم قبل الساعة 3:00 مساءً غداً حتى نتمكن من اعتماد النسخة النهائية.\n\nشكراً،\nنور",
+        "senderName": "Noor Al-Harbi",
+        "emailSubject": "مراجعة مسودة العقد قبل الغد"
+      },
+      "expectedOutput": {
+        "summary": "طلب مراجعة بنود مستويات الخدمة والجزاءات في مسودة العقد المحدثة مع المورد، وإرسال الملاحظات قبل الساعة 3:00 مساءً غداً لاعتماد النسخة النهائية.",
+        "category": "Work",
+        "priority": "Critical",
+        "sentiment": "Neutral",
+        "requiresReply": true,
+        "keyPoints": [
+          "تم إرفاق مسودة العقد المحدثة مع المورد.",
+          "المطلوب مراجعة بنود مستويات الخدمة والجزاءات.",
+          "يجب إرسال الملاحظات قبل الساعة 3:00 مساءً غداً لاعتماد النسخة النهائية.",
+          "يتطلب الأمر مراجعة بشرية بسبب أولوية الرسالة الحرجة."
+        ],
+        "actionItems": [
+          "مراجعة بنود مستويات الخدمة والجزاءات في مسودة العقد - المستلم - قبل الساعة 3:00 مساءً غداً",
+          "إرسال الملاحظات على مسودة العقد - المستلم - قبل الساعة 3:00 مساءً غداً"
+        ],
+        "deadlines": "قبل الساعة 3:00 مساءً غداً",
+        "suggestedReply": "وعليكم السلام،\n\nشكرًا نور. سنراجع بنود مستويات الخدمة والجزاءات في المسودة المرفقة ونرسل ملاحظاتنا قبل الساعة 3:00 مساءً غداً.\n\nتحياتي،",
+        "confidence": 0.97
+      },
+      "expectedAgentBehavior": "",
+      "simulationInstructions": "",
+      "simulateInput": false,
+      "inputGenerationInstructions": "",
+      "simulateTools": false,
+      "evalSetId": "cc8c90e8-fff2-4da9-b2cf-e8b20ec4a783",
+      "createdAt": "2026-09-14T01:55:38.640Z",
+      "updatedAt": "2026-09-14T01:55:38.640Z",
+      "source": "firstSuccessfulRun"
+    }
+  ],
+  "modelSettings": [],
+  "agentMemoryEnabled": false,
+  "agentMemorySettings": [],
+  "lineByLineEvaluation": false,
+  "createdAt": "2026-09-14T01:36:49.842Z",
+  "updatedAt": "2026-09-14T01:55:38.640Z",
+  "category": 1
+}

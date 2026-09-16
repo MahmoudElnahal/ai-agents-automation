@@ -1,0 +1,154 @@
+{
+  "version": "1.2.0",
+  "settings": {
+    "model": "gpt-5.6-terra",
+    "maxTokens": 24236,
+    "temperature": 0,
+    "engine": "basic-v2",
+    "maxIterations": 25,
+    "mode": "standard"
+  },
+  "inputSchema": {
+    "type": "object",
+    "required": [
+      "emailContent"
+    ],
+    "properties": {
+      "emailContent": {
+        "type": "string",
+        "description": "The full email content including sender, subject and body. Required."
+      },
+      "senderName": {
+        "type": "string",
+        "description": "The display name of the sender. Optional."
+      },
+      "emailSubject": {
+        "type": "string",
+        "description": "The subject line of the email. Optional."
+      }
+    }
+  },
+  "outputSchema": {
+    "type": "object",
+    "required": [
+      "summary",
+      "category",
+      "priority",
+      "sentiment",
+      "requiresReply",
+      "keyPoints",
+      "actionItems",
+      "deadlines",
+      "suggestedReply",
+      "confidence",
+      "finalReport"
+    ],
+    "properties": {
+      "summary": {
+        "type": "string",
+        "description": "A concise professional summary of the email."
+      },
+      "category": {
+        "type": "string",
+        "description": "One of Work, Finance, Support, Sales, Marketing, Personal, Spam, Other."
+      },
+      "priority": {
+        "type": "string",
+        "description": "One of Critical, High, Medium, Low."
+      },
+      "sentiment": {
+        "type": "string",
+        "description": "One of Positive, Neutral, Negative."
+      },
+      "requiresReply": {
+        "type": "boolean",
+        "description": "True if the sender expects a response."
+      },
+      "keyPoints": {
+        "type": "array",
+        "description": "The most important points from the email.",
+        "items": {
+          "type": "string"
+        }
+      },
+      "actionItems": {
+        "type": "array",
+        "description": "Required actions formatted as 'Task - Owner - Due date'.",
+        "items": {
+          "type": "string"
+        }
+      },
+      "deadlines": {
+        "type": "string",
+        "description": "All dates and deadlines mentioned, or 'None specified'."
+      },
+      "suggestedReply": {
+        "type": "string",
+        "description": "A short professional draft reply if a reply is needed; otherwise 'None specified'."
+      },
+      "confidence": {
+        "type": "number",
+        "description": "Confidence of the analysis between 0 and 1."
+      },
+      "finalReport": {
+        "type": "string",
+        "description": "  The complete formatted report ready to be saved to a file and uploaded to Google Drive."
+      }
+    },
+    "title": "Outputs"
+  },
+  "metadata": {
+    "storageVersion": "50.0.0",
+    "isConversational": false,
+    "targetRuntime": "pythonAgent",
+    "showProjectCreationExperience": false
+  },
+  "type": "lowCode",
+  "projectId": "0c1f0109-0edd-483d-879a-e19eec733c79",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are an Email Triage Agent that analyzes one email and returns a structured triage result.\r\n\r\nTool usage:\r\n- You MUST always use the \"Summarize Text\" tool. Never produce a summary without calling it first.\r\n- Call it exactly once, passing the cleaned email body as the text to summarize, before writing the summary, keyPoints and finalReport fields.\r\n- Base the summary on the tool output, while still extracting actions, dates, names and amounts from the original email content.\r\n\r\nWork steps:\r\n1. Read the email from the provided inputs.\r\n2. Strip greetings, signatures, disclaimers, and quoted threads from the body.\r\n3. Call the \"Summarize Text\" tool on the cleaned body.\r\n4. Classify the email into exactly one category: Work, Finance, Support, Sales, Marketing, Personal, Spam, Other.\r\n   - Use \"Support\" when the email is about an incident, outage, ticket or a technical problem affecting clients. Use \"Work\" only for general internal work matters.\r\n5. Set priority using these rules:\r\n   - Critical: outage, security, legal, payment issue, or deadline within 24 hours.\r\n   - High: direct request to the recipient or deadline within 7 days.\r\n   - Medium: informational but work related.\r\n   - Low: newsletters, marketing, automated notifications.\r\n6. Determine sentiment (Positive, Neutral, Negative) and whether the sender expects a reply.\r\n7. Extract key points, action items in \"Task - Owner - Due date\" format, and all deadlines.\r\n8. Draft a short professional reply if a reply is needed, in the same language as the email.\r\n9. Assign a confidence score between 0 and 1.\r\n10. Assemble the finalReport field.\r\n\r\nOutput rules:\r\n- Return ONLY JSON that matches outputSchema exactly. No extra keys. No markdown. No extra text.\r\n- Write every text field in the same language as the original email.\r\n- Never invent information not in the email. Keep names, amounts, invoice numbers, and dates exactly as written.\r\n- If a field has no information, use \"None specified\" or an empty array.\r\n- The finalReport field must contain one complete plain-text report, ready to be written to a file and uploaded to Google Drive, using exactly these sections in this order: \"EMAIL SUMMARY\", \"KEY POINTS\", \"REQUIRED ACTIONS\", \"IMPORTANT DATES AND DEADLINES\", \"SUGGESTED REPLY\". Put each section title on its own line, followed by its content on the lines below it. Write \"None specified\" under any section that has no content.\r\n\r\nFinal reminder: Always call the Summarize Text tool first, then return only the structured JSON output that matches outputSchema exactly.\nWork steps:\r\n1. Read the email from the provided inputs.\r\n2. Strip greetings, signatures, disclaimers, and quoted threads from the body.\r\n3. Summarize the remaining body in the same language as the original email.\r\n4. Classify the email into exactly one category: Work, Finance, Support, Sales, Marketing, Personal, Spam, Other.\r\n5. Set priority using these rules:\r\n   - Critical: outage, security, legal, payment issue, or deadline within 24 hours.\r\n   - High: direct request to the recipient or deadline within 7 days.\r\n   - Medium: informational but work related.\r\n   - Low: newsletters, marketing, automated notifications.\r\n6. Determine sentiment (Positive, Neutral, Negative) and whether the sender expects a reply.\r\n7. Extract key points, action items in \"Task - Owner - Due date\" format, and all deadlines.\r\n8. Draft a short professional reply if a reply is needed, in the same language as the email.\r\n9. Assign a confidence score between 0 and 1.\r\n\r\nOutput rules:\r\n- Return ONLY JSON that matches outputSchema exactly. No extra keys. No markdown. No extra text.\r\n- Write every text field in the same language as the original email.\r\n- Never invent information not in the email. Keep names, amounts, invoice numbers, and dates exactly as written.\r\n- If a field has no information, use \"None specified\" or an empty array.\r\n\r- The finalReport field must contain one complete plain-text report, ready to be written to a file, using exactly these sections in this order: \"EMAIL SUMMARY\", \"KEY POINTS\", \"REQUIRED ACTIONS\", \"IMPORTANT DATES AND DEADLINES\", \"SUGGESTED REPLY\". Put each section title on its own line, followed by its content.\n\n Write \"None specified\" under any section that has no content.\nFinal reminder: Return only the structured JSON output that matches outputSchema exactly.\n\nTool usage:\r\n- You MUST call the \"Summarize Text\" tool exactly once, passing the cleaned email body as the \"prompt\" parameter, before writing the summary and finalReport fields. Base the summary on the tool output, while still extracting actions, dates, names and amounts from the original email content.\r\n\r\n- The finalReport field must contain a complete plain-text report with these sections, each on its own line group: \"EMAIL SUMMARY\", \"KEY POINTS\", \"REQUIRED ACTIONS\", \"IMPORTANT DATES AND DEADLINES\", \"SUGGESTED REPLY\". Write \"None specified\" under any section that has no content.\nLeave one blank line before each section title.",
+      "contentTokens": [
+        {
+          "type": "simpleText",
+          "rawString": "You are an Email Triage Agent that analyzes one email and returns a structured triage result.\r\n\r\nTool usage:\r\n- You MUST always use the \"Summarize Text\" tool. Never produce a summary without calling it first.\r\n- Call it exactly once, passing the cleaned email body as the text to summarize, before writing the summary, keyPoints and finalReport fields.\r\n- Base the summary on the tool output, while still extracting actions, dates, names and amounts from the original email content.\r\n\r\nWork steps:\r\n1. Read the email from the provided inputs.\r\n2. Strip greetings, signatures, disclaimers, and quoted threads from the body.\r\n3. Call the \"Summarize Text\" tool on the cleaned body.\r\n4. Classify the email into exactly one category: Work, Finance, Support, Sales, Marketing, Personal, Spam, Other.\r\n   - Use \"Support\" when the email is about an incident, outage, ticket or a technical problem affecting clients. Use \"Work\" only for general internal work matters.\r\n5. Set priority using these rules:\r\n   - Critical: outage, security, legal, payment issue, or deadline within 24 hours.\r\n   - High: direct request to the recipient or deadline within 7 days.\r\n   - Medium: informational but work related.\r\n   - Low: newsletters, marketing, automated notifications.\r\n6. Determine sentiment (Positive, Neutral, Negative) and whether the sender expects a reply.\r\n7. Extract key points, action items in \"Task - Owner - Due date\" format, and all deadlines.\r\n8. Draft a short professional reply if a reply is needed, in the same language as the email.\r\n9. Assign a confidence score between 0 and 1.\r\n10. Assemble the finalReport field.\r\n\r\nOutput rules:\r\n- Return ONLY JSON that matches outputSchema exactly. No extra keys. No markdown. No extra text.\r\n- Write every text field in the same language as the original email.\r\n- Never invent information not in the email. Keep names, amounts, invoice numbers, and dates exactly as written.\r\n- If a field has no information, use \"None specified\" or an empty array.\r\n- The finalReport field must contain one complete plain-text report, ready to be written to a file and uploaded to Google Drive, using exactly these sections in this order: \"EMAIL SUMMARY\", \"KEY POINTS\", \"REQUIRED ACTIONS\", \"IMPORTANT DATES AND DEADLINES\", \"SUGGESTED REPLY\". Put each section title on its own line, followed by its content on the lines below it. Write \"None specified\" under any section that has no content.\r\n\r\nFinal reminder: Always call the Summarize Text tool first, then return only the structured JSON output that matches outputSchema exactly.\nWork steps:\r\n1. Read the email from the provided inputs.\r\n2. Strip greetings, signatures, disclaimers, and quoted threads from the body.\r\n3. Summarize the remaining body in the same language as the original email.\r\n4. Classify the email into exactly one category: Work, Finance, Support, Sales, Marketing, Personal, Spam, Other.\r\n5. Set priority using these rules:\r\n   - Critical: outage, security, legal, payment issue, or deadline within 24 hours.\r\n   - High: direct request to the recipient or deadline within 7 days.\r\n   - Medium: informational but work related.\r\n   - Low: newsletters, marketing, automated notifications.\r\n6. Determine sentiment (Positive, Neutral, Negative) and whether the sender expects a reply.\r\n7. Extract key points, action items in \"Task - Owner - Due date\" format, and all deadlines.\r\n8. Draft a short professional reply if a reply is needed, in the same language as the email.\r\n9. Assign a confidence score between 0 and 1.\r\n\r\nOutput rules:\r\n- Return ONLY JSON that matches outputSchema exactly. No extra keys. No markdown. No extra text.\r\n- Write every text field in the same language as the original email.\r\n- Never invent information not in the email. Keep names, amounts, invoice numbers, and dates exactly as written.\r\n- If a field has no information, use \"None specified\" or an empty array.\r\n\r- The finalReport field must contain one complete plain-text report, ready to be written to a file, using exactly these sections in this order: \"EMAIL SUMMARY\", \"KEY POINTS\", \"REQUIRED ACTIONS\", \"IMPORTANT DATES AND DEADLINES\", \"SUGGESTED REPLY\". Put each section title on its own line, followed by its content.\n\n Write \"None specified\" under any section that has no content.\nFinal reminder: Return only the structured JSON output that matches outputSchema exactly.\n\nTool usage:\r\n- You MUST call the \"Summarize Text\" tool exactly once, passing the cleaned email body as the \"prompt\" parameter, before writing the summary and finalReport fields. Base the summary on the tool output, while still extracting actions, dates, names and amounts from the original email content.\r\n\r\n- The finalReport field must contain a complete plain-text report with these sections, each on its own line group: \"EMAIL SUMMARY\", \"KEY POINTS\", \"REQUIRED ACTIONS\", \"IMPORTANT DATES AND DEADLINES\", \"SUGGESTED REPLY\". Write \"None specified\" under any section that has no content.\nLeave one blank line before each section title."
+        }
+      ]
+    },
+    {
+      "role": "user",
+      "content": "Analyze the following email and return a structured triage result.\r\n\r\nInputs:\r\n- Email content: <email_content>{{input.emailContent}}</email_content>\r\n- Sender name: <sender_name>{{input.senderName}}</sender_name>\r\n- Email subject: <email_subject>{{input.emailSubject}}</email_subject>\r\n\r\nSteps:\r\n1. Ignore greetings, signatures, disclaimers, and quoted threads.\r\n2. Summarize the remaining email body in the same language as the email.\r\n3. Classify the email, set priority, sentiment, and reply need.\r\n4. Extract key points, action items, and deadlines.\r\n5. Draft a suggested reply if required.\r\n\r\nOutput rules:\r\n- Return ONLY JSON that matches outputSchema exactly. No extra keys. No markdown. No extra text.\r\n- Use \"None specified\" or empty arrays for missing information.\r\n- Write all text in the same language as the original email.",
+      "contentTokens": [
+        {
+          "type": "simpleText",
+          "rawString": "Analyze the following email and return a structured triage result.\r\n\r\nInputs:\r\n- Email content: <email_content>"
+        },
+        {
+          "type": "variable",
+          "rawString": "input.emailContent"
+        },
+        {
+          "type": "simpleText",
+          "rawString": "</email_content>\r\n- Sender name: <sender_name>"
+        },
+        {
+          "type": "variable",
+          "rawString": "input.senderName"
+        },
+        {
+          "type": "simpleText",
+          "rawString": "</sender_name>\r\n- Email subject: <email_subject>"
+        },
+        {
+          "type": "variable",
+          "rawString": "input.emailSubject"
+        },
+        {
+          "type": "simpleText",
+          "rawString": "</email_subject>\r\n\r\nSteps:\r\n1. Ignore greetings, signatures, disclaimers, and quoted threads.\r\n2. Summarize the remaining email body in the same language as the email.\r\n3. Classify the email, set priority, sentiment, and reply need.\r\n4. Extract key points, action items, and deadlines.\r\n5. Draft a suggested reply if required.\r\n\r\nOutput rules:\r\n- Return ONLY JSON that matches outputSchema exactly. No extra keys. No markdown. No extra text.\r\n- Use \"None specified\" or empty arrays for missing information.\r\n- Write all text in the same language as the original email."
+        }
+      ]
+    }
+  ]
+}

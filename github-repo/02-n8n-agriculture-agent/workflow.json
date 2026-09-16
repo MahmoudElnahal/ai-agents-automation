@@ -1,0 +1,343 @@
+{
+  "name": "🌱 Digital Agriculture AI Agent - FULL DEMO",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "53da78f3-e746-4189-8b36-9dec8470454f",
+      "name": "START DEMO",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1664,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Digital agriculture ai automation",
+          "cachedResultUrl": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 918728156,
+          "mode": "list",
+          "cachedResultName": "Sensor_Data",
+          "cachedResultUrl": ""
+        },
+        "options": {}
+      },
+      "id": "c3206a72-2105-4a3f-a9aa-5beb7e99940a",
+      "name": "📊 Get Farm Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1456,
+        96
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Google Sheets account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(i => i.json).filter(r => r && (r.Farm || r.farm));\n\nconst cleanNumber = (v) => {\n  const n = Number(String(v ?? 0).replace(/,/g, '').replace('%', '').trim());\n  return Number.isFinite(n) ? n : 0;\n};\n\nconst farmName = r => r.Farm || r.farm || 'Unknown Farm';\nconst cropName = r => r.Crop || r.crop || 'Unknown';\nconst risk = r => String(r.AI_Risk || r.ai_risk || '').toUpperCase();\nconst decision = r => String(r.AI_Decision || r.ai_decision || '').toUpperCase();\n\nconst totalRecords = rows.length;\nconst farms = [...new Set(rows.map(farmName))];\nconst crops = [...new Set(rows.map(cropName))];\n\nconst highRisk = rows.filter(r => risk(r) === 'HIGH');\nconst mediumRisk = rows.filter(r => risk(r) === 'MEDIUM');\nconst irrigation = rows.filter(r => decision(r) === 'IRRIGATE');\n\nconst sum = field => rows.reduce((s, r) => s + cleanNumber(r[field]), 0);\nconst avg = field => totalRecords ? +(sum(field) / totalRecords).toFixed(2) : 0;\n\nconst farmMap = {};\n\nfor (const r of rows) {\n  const farm = farmName(r);\n\n  if (!farmMap[farm]) {\n    farmMap[farm] = {\n      farm,\n      region: r.Region || r.region || 'Unknown',\n      crop: cropName(r),\n      records: 0,\n      highRisk: 0,\n      mediumRisk: 0,\n      irrigation: 0,\n      water: 0,\n      energy: 0,\n      soil: 0,\n      leaf: 0,\n      temperature: 0,\n      humidity: 0\n    };\n  }\n\n  const f = farmMap[farm];\n\n  f.records++;\n  if (risk(r) === 'HIGH') f.highRisk++;\n  if (risk(r) === 'MEDIUM') f.mediumRisk++;\n  if (decision(r) === 'IRRIGATE') f.irrigation++;\n\n  f.water += cleanNumber(r.Estimated_Water_Liters);\n  f.energy += cleanNumber(r.Estimated_Energy_kWh);\n  f.soil += cleanNumber(r.Soil_Moisture_pct);\n  f.leaf += cleanNumber(r.Leaf_Health_pct);\n  f.temperature += cleanNumber(r.Temperature_C);\n  f.humidity += cleanNumber(r.Humidity_pct);\n}\n\nconst farmAnalysis = Object.values(farmMap).map(f => ({\n  farm: f.farm,\n  region: f.region,\n  crop: f.crop,\n  records: f.records,\n  highRisk: f.highRisk,\n  mediumRisk: f.mediumRisk,\n  irrigation: f.irrigation,\n  water_liters: Math.round(f.water),\n  energy_kwh: +f.energy.toFixed(2),\n  avg_soil_moisture: +(f.soil / f.records).toFixed(1),\n  avg_leaf_health: +(f.leaf / f.records).toFixed(1),\n  avg_temperature: +(f.temperature / f.records).toFixed(1),\n  avg_humidity: +(f.humidity / f.records).toFixed(1)\n}));\n\nconst priorityFarms = [...farmAnalysis]\n  .sort((a, b) => {\n    if (b.highRisk !== a.highRisk) return b.highRisk - a.highRisk;\n    return a.avg_soil_moisture - b.avg_soil_moisture;\n  })\n  .slice(0, 8);\n\nconst waterConsumers = [...farmAnalysis]\n  .sort((a, b) => b.water_liters - a.water_liters)\n  .slice(0, 5);\n\nconst decisionCounts = {};\n\nfor (const r of rows) {\n  const d = decision(r) || 'UNKNOWN';\n  decisionCounts[d] = (decisionCounts[d] || 0) + 1;\n}\n\nconst analysis = {\n  total_records: totalRecords,\n  total_farms: farms.length,\n  total_crops: crops.length,\n  high_risk_events: highRisk.length,\n  medium_risk_events: mediumRisk.length,\n  irrigation_events: irrigation.length,\n  total_water_liters: Math.round(sum('Estimated_Water_Liters')),\n  total_energy_kwh: +sum('Estimated_Energy_kWh').toFixed(2),\n  average_temperature: avg('Temperature_C'),\n  average_humidity: avg('Humidity_pct'),\n  average_soil_moisture: avg('Soil_Moisture_pct'),\n  average_leaf_health: avg('Leaf_Health_pct'),\n  decisions: decisionCounts,\n  priority_farms: priorityFarms,\n  top_water_consumers: waterConsumers\n};\n\nreturn [{ json: { analysis } }];"
+      },
+      "id": "af38ba39-1063-4bbd-9550-0072ae6bc8c6",
+      "name": "📈 Farm Analytics Engine",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1216,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze this agricultural dataset and act as a Senior Agricultural Intelligence Agent.\n\nDATA:\n{{ JSON.stringify($json.analysis) }}\n\nYour job is to:\n1. Detect critical agricultural risks.\n2. Identify priority farms.\n3. Recommend irrigation/inspection actions.\n4. Identify water efficiency opportunities.\n5. Produce an executive management decision.\n6. Decide whether an urgent email alert is required.\n\nIMPORTANT:\n- Use ONLY the supplied data.\n- Never invent measurements.\n- Do not claim that irrigation physically happened.\n- This is decision support, not physical execution.\n\nReturn ONLY valid JSON with this exact structure:\n{\n  \"executive_status\": \"CRITICAL\",\n  \"critical_alert\": true,\n  \"headline\": \"short headline\",\n  \"summary\": \"executive summary\",\n  \"priority_farms\": [\n    {\n      \"farm\": \"farm name\",\n      \"priority\": \"HIGH\",\n      \"reason\": \"reason\",\n      \"action\": \"recommended action\"\n    }\n  ],\n  \"recommendations\": [\n    \"recommendation 1\",\n    \"recommendation 2\",\n    \"recommendation 3\"\n  ],\n  \"water_efficiency_note\": \"water recommendation\",\n  \"email_message\": \"short manager message\"\n}",
+        "options": {
+          "systemMessage": "You are an agricultural AI decision-support agent. Be precise, analytical and conservative. Never invent facts."
+        }
+      },
+      "id": "e1fcb475-a0b6-4e54-9541-4fc126949193",
+      "name": "🤖 Agricultural AI Decision Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -944,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "options": {
+          "temperature": 0
+        }
+      },
+      "id": "2c98ef88-56dd-474e-851c-ea1150f0ce5e",
+      "name": "🧠 OpenAI Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -944,
+        384
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst analysis = $('📈 Farm Analytics Engine').first().json.analysis;\n\nlet raw = input.output ?? input.text ?? input.response ?? input.message ?? input;\n\nif (typeof raw === 'object') {\n  raw = raw.output ?? raw.text ?? raw.response ?? raw;\n}\n\nlet ai;\n\nfunction fallback() {\n  const critical = Number(analysis.high_risk_events || 0) > 0;\n\n  return {\n    executive_status: critical ? 'CRITICAL' : 'HEALTHY',\n    critical_alert: critical,\n    headline: critical ? 'Critical agricultural risk detected' : 'Farm conditions are stable',\n    summary: critical\n      ? `${analysis.high_risk_events} high-risk events were detected across the monitored farms.`\n      : 'No high-risk events were detected in the supplied dataset.',\n    priority_farms: (analysis.priority_farms || []).slice(0, 8).map(f => ({\n      farm: f.farm,\n      priority: f.highRisk > 0 ? 'HIGH' : 'MEDIUM',\n      reason: `High risk events: ${f.highRisk}; soil moisture: ${f.avg_soil_moisture}%`,\n      action: f.avg_soil_moisture < 30 ? 'Inspect irrigation conditions' : 'Continue monitoring'\n    })),\n    recommendations: [\n      'Inspect high-risk farms first.',\n      'Review irrigation requirements in low-moisture zones.',\n      'Monitor water consumption and field conditions.'\n    ],\n    water_efficiency_note: `Total estimated water consumption is ${analysis.total_water_liters} liters. Review the highest-consuming farms for optimization.`,\n    email_message: critical\n      ? 'Urgent review is recommended for the farms identified above.'\n      : 'No urgent intervention is required based on the current dataset.'\n  };\n}\n\ntry {\n  let text = typeof raw === 'string' ? raw : JSON.stringify(raw);\n\n  text = text\n    .replace(/```json/gi, '')\n    .replace(/```/g, '')\n    .trim();\n\n  const firstBrace = text.indexOf('{');\n  const lastBrace = text.lastIndexOf('}');\n\n  if (firstBrace !== -1 && lastBrace !== -1) {\n    text = text.substring(firstBrace, lastBrace + 1);\n  }\n\n  ai = JSON.parse(text);\n} catch (e) {\n  ai = fallback();\n}\n\nconst boolValue = value => {\n  if (value === true) return true;\n  if (value === false) return false;\n  return ['true', '1', 'yes', 'critical', 'urgent'].includes(String(value).toLowerCase());\n};\n\nai.critical_alert = boolValue(ai.critical_alert);\n\nif (!ai.executive_status) {\n  ai.executive_status = ai.critical_alert ? 'CRITICAL' : 'HEALTHY';\n}\n\nif (!Array.isArray(ai.priority_farms)) ai.priority_farms = [];\nif (!Array.isArray(ai.recommendations)) ai.recommendations = [];\n\nreturn [{\n  json: {\n    analysis,\n    ai\n  }\n}];"
+      },
+      "id": "c72d3b12-399a-4179-88aa-90f0e31a25fc",
+      "name": "🧩 Validate AI Decision",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "critical-condition",
+              "leftValue": "={{ Boolean($json.ai.critical_alert) }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "583a9361-7861-4c73-982a-5a1ec760891b",
+      "name": "🚨 Critical Risk?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -352,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nconst a = d.analysis;\nconst ai = d.ai;\n\nconst escape = v => String(v ?? '')\n  .replace(/&/g, '&amp;')\n  .replace(/</g, '&lt;')\n  .replace(/>/g, '&gt;')\n  .replace(/\"/g, '&quot;');\n\nconst status = escape(ai.executive_status || 'ATTENTION');\nconst critical = Boolean(ai.critical_alert);\nconst statusColor = critical ? '#dc2626' : '#16a34a';\nconst statusBg = critical ? '#fef2f2' : '#f0fdf4';\n\nconst farmRows = (ai.priority_farms || []).map(f => `\n<tr>\n<td style=\"padding:12px;border-bottom:1px solid #e5e7eb\"><b>${escape(f.farm)}</b></td>\n<td style=\"padding:12px;border-bottom:1px solid #e5e7eb\">${escape(f.priority)}</td>\n<td style=\"padding:12px;border-bottom:1px solid #e5e7eb\">${escape(f.reason)}</td>\n<td style=\"padding:12px;border-bottom:1px solid #e5e7eb\">${escape(f.action)}</td>\n</tr>`).join('');\n\nconst recommendations = (ai.recommendations || [])\n.map(x => `<li style=\"margin:8px 0\">${escape(x)}</li>`)\n.join('');\n\nconst html = `<!DOCTYPE html>\n<html>\n<head><meta charset=\"UTF-8\"></head>\n<body style=\"margin:0;background:#eef4ef;font-family:Arial,Helvetica,sans-serif;color:#17201a\">\n<div style=\"max-width:920px;margin:25px auto;background:white;border-radius:18px;overflow:hidden;box-shadow:0 10px 35px rgba(0,0,0,.10)\">\n\n<div style=\"background:linear-gradient(135deg,#0b3d1c,#278a43);padding:35px;color:white\">\n<div style=\"font-size:13px;letter-spacing:2px\">DIGITAL AGRICULTURE</div>\n<h1 style=\"margin:8px 0\">🌱 AI Farm Intelligence</h1>\n<div>Excel → Analytics → AI Agent → Decision → Automation</div>\n</div>\n\n<div style=\"padding:30px\">\n\n<div style=\"background:${statusBg};border-left:6px solid ${statusColor};padding:20px;border-radius:12px\">\n<div style=\"font-size:12px;color:#64748b;font-weight:bold\">EXECUTIVE STATUS</div>\n<div style=\"font-size:30px;color:${statusColor};font-weight:bold\">${status}</div>\n<div style=\"font-size:19px;font-weight:bold;margin-top:8px\">${escape(ai.headline)}</div>\n<p style=\"line-height:1.7\">${escape(ai.summary)}</p>\n</div>\n\n<h2>📊 Executive KPIs</h2>\n<table style=\"width:100%;border-spacing:8px\">\n<tr>\n<td style=\"background:#f8fafc;padding:18px;text-align:center\"><small>RECORDS</small><br><b style=\"font-size:26px\">${a.total_records}</b></td>\n<td style=\"background:#f8fafc;padding:18px;text-align:center\"><small>FARMS</small><br><b style=\"font-size:26px\">${a.total_farms}</b></td>\n<td style=\"background:#fef2f2;padding:18px;text-align:center\"><small>HIGH RISK</small><br><b style=\"font-size:26px;color:#dc2626\">${a.high_risk_events}</b></td>\n<td style=\"background:#ecfdf5;padding:18px;text-align:center\"><small>IRRIGATION</small><br><b style=\"font-size:26px;color:#166534\">${a.irrigation_events}</b></td>\n</tr>\n<tr>\n<td style=\"background:#f8fafc;padding:18px;text-align:center\"><small>SOIL</small><br><b style=\"font-size:23px\">${a.average_soil_moisture}%</b></td>\n<td style=\"background:#f8fafc;padding:18px;text-align:center\"><small>LEAF HEALTH</small><br><b style=\"font-size:23px\">${a.average_leaf_health}%</b></td>\n<td style=\"background:#f8fafc;padding:18px;text-align:center\"><small>WATER</small><br><b style=\"font-size:23px\">${Number(a.total_water_liters).toLocaleString()} L</b></td>\n<td style=\"background:#f8fafc;padding:18px;text-align:center\"><small>ENERGY</small><br><b style=\"font-size:23px\">${a.total_energy_kwh} kWh</b></td>\n</tr>\n</table>\n\n<h2>🚨 AI Priority Farms</h2>\n<table style=\"width:100%;border-collapse:collapse;font-size:13px\">\n<thead><tr style=\"background:#f3f4f6\">\n<th style=\"padding:12px;text-align:left\">Farm</th>\n<th style=\"padding:12px;text-align:left\">Priority</th>\n<th style=\"padding:12px;text-align:left\">Reason</th>\n<th style=\"padding:12px;text-align:left\">Action</th>\n</tr></thead>\n<tbody>${farmRows}</tbody>\n</table>\n\n<h2>🎯 AI Recommendations</h2>\n<ul style=\"line-height:1.6\">${recommendations}</ul>\n\n<div style=\"background:#ecfdf5;padding:20px;border-radius:12px;margin-top:25px\">\n<b>💧 Water Efficiency</b>\n<p>${escape(ai.water_efficiency_note)}</p>\n</div>\n\n<div style=\"background:#111827;color:white;padding:22px;border-radius:12px;margin-top:20px\">\n<b>🤖 AI Agent Decision</b>\n<p style=\"line-height:1.7\">${escape(ai.email_message)}</p>\n</div>\n\n</div>\n\n<div style=\"padding:18px;text-align:center;background:#f8fafc;color:#64748b;font-size:12px\">\nAutomated by n8n • Digital Agriculture AI Demo\n</div>\n</div>\n</body>\n</html>`;\n\nreturn [{\n  json: {\n    ...d,\n    email_subject: critical ? `🚨 CRITICAL FARM ALERT | ${ai.headline}` : `📊 FARM AI REPORT | ${ai.headline}`,\n    email_html: html\n  }\n}];"
+      },
+      "id": "aa89282e-d3e7-496c-887e-7015832cdd3d",
+      "name": "🎨 Build Critical HTML Dashboard",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nconst a = d.analysis;\nconst ai = d.ai;\n\nconst html = `\n<div style=\"font-family:Arial,sans-serif;max-width:700px;margin:auto\">\n<div style=\"background:#0b3d1c;color:white;padding:30px;border-radius:15px 15px 0 0\">\n<h1>🌱 Farm Management Report</h1>\n<p>AI-powered agricultural analysis</p>\n</div>\n<div style=\"padding:25px;background:white;border:1px solid #ddd\">\n<h2>${ai.headline || 'Farm Analysis'}</h2>\n<p>${ai.summary || ''}</p>\n<hr>\n<h3>📊 KPIs</h3>\n<ul>\n<li>Total farms: <b>${a.total_farms}</b></li>\n<li>Records: <b>${a.total_records}</b></li>\n<li>High risk events: <b>${a.high_risk_events}</b></li>\n<li>Irrigation events: <b>${a.irrigation_events}</b></li>\n<li>Average soil moisture: <b>${a.average_soil_moisture}%</b></li>\n<li>Average leaf health: <b>${a.average_leaf_health}%</b></li>\n<li>Total water: <b>${a.total_water_liters} L</b></li>\n</ul>\n<h3>🎯 Recommendations</h3>\n<ul>${(ai.recommendations || []).map(x => `<li>${x}</li>`).join('')}</ul>\n</div>\n</div>`;\n\nreturn [{\n  json: {\n    ...d,\n    email_subject: `📊 Farm AI Management Report | ${ai.headline || 'Analysis'}`,\n    email_html: html\n  }\n}];"
+      },
+      "id": "d6fe2045-5441-4227-99ab-d980149abed0",
+      "name": "📊 Build Normal HTML Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "your-email@example.com",
+        "subject": "={{ $json.email_subject }}",
+        "message": "={{ $json.email_html }}",
+        "options": {}
+      },
+      "id": "3077771a-fe1d-46f0-92b3-a28da808389f",
+      "name": "🚨 Send Critical Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        -48
+      ],
+      "webhookId": "3d803b9a-8fb4-4ef5-93fe-91d07149c9f6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "your-email@example.com",
+        "subject": "={{ $json.email_subject }}",
+        "message": "={{ $json.email_html }}",
+        "options": {}
+      },
+      "id": "198c86b5-6d04-41cf-93ca-55a13df6e89c",
+      "name": "📧 Send Management Report",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        240
+      ],
+      "webhookId": "b04fe8b5-bb5e-4711-8e59-e97aaa4ee294",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "START DEMO": {
+      "main": [
+        [
+          {
+            "node": "📊 Get Farm Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📊 Get Farm Data": {
+      "main": [
+        [
+          {
+            "node": "📈 Farm Analytics Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📈 Farm Analytics Engine": {
+      "main": [
+        [
+          {
+            "node": "🤖 Agricultural AI Decision Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧠 OpenAI Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "🤖 Agricultural AI Decision Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 Agricultural AI Decision Agent": {
+      "main": [
+        [
+          {
+            "node": "🧩 Validate AI Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧩 Validate AI Decision": {
+      "main": [
+        [
+          {
+            "node": "🚨 Critical Risk?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🚨 Critical Risk?": {
+      "main": [
+        [
+          {
+            "node": "🎨 Build Critical HTML Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "📊 Build Normal HTML Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🎨 Build Critical HTML Dashboard": {
+      "main": [
+        [
+          {
+            "node": "🚨 Send Critical Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📊 Build Normal HTML Report": {
+      "main": [
+        [
+          {
+            "node": "📧 Send Management Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1b090462-5c30-4555-aade-8f054b3b4987",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  },
+  "id": "ws6LWJWLUao2vRlH",
+  "tags": []
+}

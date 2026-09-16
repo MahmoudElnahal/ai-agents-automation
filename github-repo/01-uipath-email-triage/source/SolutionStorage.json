@@ -1,0 +1,13 @@
+{
+  "SolutionId": "5c6c1eab-2518-4ab3-63ab-08df1067de34",
+  "Projects": [
+    {
+      "ProjectId": "4fd8f32b-8fef-47dc-9556-c2f9219f5a16",
+      "ProjectRelativePath": "RPA Workflow/project.uiproj"
+    },
+    {
+      "ProjectId": "0c1f0109-0edd-483d-879a-e19eec733c79",
+      "ProjectRelativePath": "Agent/project.uiproj"
+    }
+  ]
+}

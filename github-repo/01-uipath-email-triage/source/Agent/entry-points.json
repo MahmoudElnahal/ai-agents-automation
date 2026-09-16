@@ -1,0 +1,100 @@
+{
+  "$schema": "https://cloud.uipath.com/draft/2024-12/entry-point",
+  "$id": "entry-points.json",
+  "entryPoints": [
+    {
+      "filePath": "/content/agent.json",
+      "type": "agent",
+      "uniqueId": "3196492b-e69f-49ce-89c5-8327a936ab88",
+      "input": {
+        "type": "object",
+        "required": [
+          "emailContent"
+        ],
+        "properties": {
+          "emailContent": {
+            "type": "string",
+            "description": "The full email content including sender, subject and body. Required."
+          },
+          "senderName": {
+            "type": "string",
+            "description": "The display name of the sender. Optional."
+          },
+          "emailSubject": {
+            "type": "string",
+            "description": "The subject line of the email. Optional."
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "required": [
+          "summary",
+          "category",
+          "priority",
+          "sentiment",
+          "requiresReply",
+          "keyPoints",
+          "actionItems",
+          "deadlines",
+          "suggestedReply",
+          "confidence",
+          "finalReport"
+        ],
+        "properties": {
+          "summary": {
+            "type": "string",
+            "description": "A concise professional summary of the email."
+          },
+          "category": {
+            "type": "string",
+            "description": "One of Work, Finance, Support, Sales, Marketing, Personal, Spam, Other."
+          },
+          "priority": {
+            "type": "string",
+            "description": "One of Critical, High, Medium, Low."
+          },
+          "sentiment": {
+            "type": "string",
+            "description": "One of Positive, Neutral, Negative."
+          },
+          "requiresReply": {
+            "type": "boolean",
+            "description": "True if the sender expects a response."
+          },
+          "keyPoints": {
+            "type": "array",
+            "description": "The most important points from the email.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "actionItems": {
+            "type": "array",
+            "description": "Required actions formatted as 'Task - Owner - Due date'.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deadlines": {
+            "type": "string",
+            "description": "All dates and deadlines mentioned, or 'None specified'."
+          },
+          "suggestedReply": {
+            "type": "string",
+            "description": "A short professional draft reply if a reply is needed; otherwise 'None specified'."
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Confidence of the analysis between 0 and 1."
+          },
+          "finalReport": {
+            "type": "string",
+            "description": "  The complete formatted report ready to be saved to a file and uploaded to Google Drive."
+          }
+        },
+        "title": "Outputs"
+      }
+    }
+  ]
+}

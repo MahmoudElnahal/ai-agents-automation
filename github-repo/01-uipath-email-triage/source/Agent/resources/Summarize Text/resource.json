@@ -1,0 +1,982 @@
+{
+  "$resourceType": "tool",
+  "id": "96ae914f-5554-47ed-bab2-e4194c66dcfc",
+  "type": "integration",
+  "location": "external",
+  "name": "Summarize Text",
+  "description": "Summarizes long email text into concise bullet points using a UiPath LLM. Call this tool once with the full email body before producing the summary and finalReport fields.",
+  "isEnabled": true,
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "modelName": {
+        "type": "string",
+        "title": "Model name",
+        "description": "The generative AI model or ID to use. This activity defaults to the model with the highest quality observed output, however, a different model can be selected based on desired outputs and testing. Switching models can have impacts on the output.",
+        "enum": [
+          "gpt-5.5-2026-04-23"
+        ]
+      },
+      "summaryFormat": {
+        "type": "string",
+        "title": "Summary format",
+        "description": "\tBulleted list",
+        "oneOf": [
+          {
+            "const": "Paragraph",
+            "title": "Paragraph"
+          },
+          {
+            "const": "Bulleted list",
+            "title": "Bulleted list"
+          },
+          {
+            "const": "Numbered list",
+            "title": "Numbered list"
+          },
+          {
+            "const": "Outline",
+            "title": "Outline"
+          },
+          {
+            "const": "Tabular",
+            "title": "Tabular"
+          },
+          {
+            "const": "Chronological",
+            "title": "Chronological"
+          }
+        ],
+        "enum": [
+          "Paragraph",
+          "Bulleted list",
+          "Numbered list",
+          "Outline",
+          "Tabular",
+          "Chronological"
+        ]
+      },
+      "maxWordCount": {
+        "type": "integer",
+        "title": "Number of summary words",
+        "description": "150"
+      },
+      "temperature": {
+        "type": "number",
+        "title": "Creativity",
+        "description": "A number between 0.0 and 2.0 indicating the creativity factor or sampling temperature to use. Higher values means the model will be more creative with the summarization, but also take more risks, which could lead to more variance from the input text to summarize. Defaults to 0.5"
+      },
+      "prompt": {
+        "type": "string",
+        "title": "Text to summarize",
+        "description": "The full email body to summarize, taken from the emailContent input."
+      },
+      "detectInputLanguage": {
+        "type": "boolean",
+        "title": "Detect language for output",
+        "description": "Detect the language input and either return the summary in the same language or a different language"
+      },
+      "outputLanguage": {
+        "type": "string",
+        "title": "Output language",
+        "description": "Language preference for output if not the same as input",
+        "oneOf": [
+          {
+            "const": "Afrikaans",
+            "title": "Afrikaans"
+          },
+          {
+            "const": "Amharic",
+            "title": "Amharic"
+          },
+          {
+            "const": "Arabic",
+            "title": "Arabic"
+          },
+          {
+            "const": "Assamese",
+            "title": "Assamese"
+          },
+          {
+            "const": "Azerbaijani",
+            "title": "Azerbaijani"
+          },
+          {
+            "const": "Bulgarian",
+            "title": "Bulgarian"
+          },
+          {
+            "const": "Bengali",
+            "title": "Bengali"
+          },
+          {
+            "const": "Bosnian",
+            "title": "Bosnian"
+          },
+          {
+            "const": "Catalan",
+            "title": "Catalan"
+          },
+          {
+            "const": "Czech",
+            "title": "Czech"
+          },
+          {
+            "const": "Welsh",
+            "title": "Welsh"
+          },
+          {
+            "const": "Danish",
+            "title": "Danish"
+          },
+          {
+            "const": "German",
+            "title": "German"
+          },
+          {
+            "const": "Greek",
+            "title": "Greek"
+          },
+          {
+            "const": "English",
+            "title": "English"
+          },
+          {
+            "const": "Spanish",
+            "title": "Spanish"
+          },
+          {
+            "const": "Estonian",
+            "title": "Estonian"
+          },
+          {
+            "const": "Basque",
+            "title": "Basque"
+          },
+          {
+            "const": "Persian",
+            "title": "Persian"
+          },
+          {
+            "const": "Finnish",
+            "title": "Finnish"
+          },
+          {
+            "const": "French",
+            "title": "French"
+          },
+          {
+            "const": "Irish",
+            "title": "Irish"
+          },
+          {
+            "const": "Galician",
+            "title": "Galician"
+          },
+          {
+            "const": "Gujarati",
+            "title": "Gujarati"
+          },
+          {
+            "const": "Hebrew",
+            "title": "Hebrew"
+          },
+          {
+            "const": "Hindi",
+            "title": "Hindi"
+          },
+          {
+            "const": "Croatian",
+            "title": "Croatian"
+          },
+          {
+            "const": "Hungarian",
+            "title": "Hungarian"
+          },
+          {
+            "const": "Armenian",
+            "title": "Armenian"
+          },
+          {
+            "const": "Italian",
+            "title": "Italian"
+          },
+          {
+            "const": "Indonesian",
+            "title": "Indonesian"
+          },
+          {
+            "const": "Japanese",
+            "title": "Japanese"
+          },
+          {
+            "const": "Georgian",
+            "title": "Georgian"
+          },
+          {
+            "const": "Kazakh",
+            "title": "Kazakh"
+          },
+          {
+            "const": "Khmer",
+            "title": "Khmer"
+          },
+          {
+            "const": "Kannada",
+            "title": "Kannada"
+          },
+          {
+            "const": "Korean",
+            "title": "Korean"
+          },
+          {
+            "const": "Kurdish (Kurmanji)",
+            "title": "Kurdish (Kurmanji)"
+          },
+          {
+            "const": "Kyrgyz",
+            "title": "Kyrgyz"
+          },
+          {
+            "const": "Lao",
+            "title": "Lao"
+          },
+          {
+            "const": "Lithuanian",
+            "title": "Lithuanian"
+          },
+          {
+            "const": "Latvian",
+            "title": "Latvian"
+          },
+          {
+            "const": "Malagasy",
+            "title": "Malagasy"
+          },
+          {
+            "const": "Macedonian",
+            "title": "Macedonian"
+          },
+          {
+            "const": "Malayalam",
+            "title": "Malayalam"
+          },
+          {
+            "const": "Mongolian",
+            "title": "Mongolian"
+          },
+          {
+            "const": "Marathi",
+            "title": "Marathi"
+          },
+          {
+            "const": "Malay",
+            "title": "Malay"
+          },
+          {
+            "const": "Burmese",
+            "title": "Burmese"
+          },
+          {
+            "const": "Nepali",
+            "title": "Nepali"
+          },
+          {
+            "const": "Dutch",
+            "title": "Dutch"
+          },
+          {
+            "const": "Norwegian (Bokmål)",
+            "title": "Norwegian (Bokmål)"
+          },
+          {
+            "const": "Odia",
+            "title": "Odia"
+          },
+          {
+            "const": "Punjabi",
+            "title": "Punjabi"
+          },
+          {
+            "const": "Polish",
+            "title": "Polish"
+          },
+          {
+            "const": "Pashto",
+            "title": "Pashto"
+          },
+          {
+            "const": "Portuguese (Brazil)",
+            "title": "Portuguese (Brazil)"
+          },
+          {
+            "const": "Portuguese (Portugal)",
+            "title": "Portuguese (Portugal)"
+          },
+          {
+            "const": "Romanian",
+            "title": "Romanian"
+          },
+          {
+            "const": "Russian",
+            "title": "Russian"
+          },
+          {
+            "const": "Slovak",
+            "title": "Slovak"
+          },
+          {
+            "const": "Slovenian",
+            "title": "Slovenian"
+          },
+          {
+            "const": "Somali",
+            "title": "Somali"
+          },
+          {
+            "const": "Albanian",
+            "title": "Albanian"
+          },
+          {
+            "const": "Serbian",
+            "title": "Serbian"
+          },
+          {
+            "const": "Swazi",
+            "title": "Swazi"
+          },
+          {
+            "const": "Swedish",
+            "title": "Swedish"
+          },
+          {
+            "const": "Swahili",
+            "title": "Swahili"
+          },
+          {
+            "const": "Tamil",
+            "title": "Tamil"
+          },
+          {
+            "const": "Telugu",
+            "title": "Telugu"
+          },
+          {
+            "const": "Thai",
+            "title": "Thai"
+          },
+          {
+            "const": "Turkish",
+            "title": "Turkish"
+          },
+          {
+            "const": "Uyghur",
+            "title": "Uyghur"
+          },
+          {
+            "const": "Ukrainian",
+            "title": "Ukrainian"
+          },
+          {
+            "const": "Urdu",
+            "title": "Urdu"
+          },
+          {
+            "const": "Uzbek",
+            "title": "Uzbek"
+          },
+          {
+            "const": "Vietnamese",
+            "title": "Vietnamese"
+          },
+          {
+            "const": "Chinese",
+            "title": "Chinese"
+          }
+        ],
+        "enum": [
+          "Afrikaans",
+          "Amharic",
+          "Arabic",
+          "Assamese",
+          "Azerbaijani",
+          "Bulgarian",
+          "Bengali",
+          "Bosnian",
+          "Catalan",
+          "Czech",
+          "Welsh",
+          "Danish",
+          "German",
+          "Greek",
+          "English",
+          "Spanish",
+          "Estonian",
+          "Basque",
+          "Persian",
+          "Finnish",
+          "French",
+          "Irish",
+          "Galician",
+          "Gujarati",
+          "Hebrew",
+          "Hindi",
+          "Croatian",
+          "Hungarian",
+          "Armenian",
+          "Italian",
+          "Indonesian",
+          "Japanese",
+          "Georgian",
+          "Kazakh",
+          "Khmer",
+          "Kannada",
+          "Korean",
+          "Kurdish (Kurmanji)",
+          "Kyrgyz",
+          "Lao",
+          "Lithuanian",
+          "Latvian",
+          "Malagasy",
+          "Macedonian",
+          "Malayalam",
+          "Mongolian",
+          "Marathi",
+          "Malay",
+          "Burmese",
+          "Nepali",
+          "Dutch",
+          "Norwegian (Bokmål)",
+          "Odia",
+          "Punjabi",
+          "Polish",
+          "Pashto",
+          "Portuguese (Brazil)",
+          "Portuguese (Portugal)",
+          "Romanian",
+          "Russian",
+          "Slovak",
+          "Slovenian",
+          "Somali",
+          "Albanian",
+          "Serbian",
+          "Swazi",
+          "Swedish",
+          "Swahili",
+          "Tamil",
+          "Telugu",
+          "Thai",
+          "Turkish",
+          "Uyghur",
+          "Ukrainian",
+          "Urdu",
+          "Uzbek",
+          "Vietnamese",
+          "Chinese"
+        ]
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "prompt"
+    ]
+  },
+  "outputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "summary": {
+        "title": "Summary",
+        "type": "string",
+        "description": "The summary generated by the AI for the provided input text"
+      },
+      "detectInputLanguage": {
+        "title": "Detect language for output",
+        "type": "boolean",
+        "description": "Detect the language input and either return the summary in the same language or a different language"
+      }
+    },
+    "definitions": {}
+  },
+  "iconUrl": "https://cloud.uipath.com/elements_/scaleunit_/58cb4f17-4581-4130-a2ae-52448b37dc03/v3/element/elements/uipath-uipath-airdk/image",
+  "settings": {},
+  "guardrail": {
+    "policies": []
+  },
+  "isPreview": true,
+  "properties": {
+    "toolPath": "/summarise",
+    "objectName": "summarise",
+    "toolDisplayName": "Summarize Text",
+    "toolDescription": "Summarize text using a Large Language Model (LLM) within UiPath. ",
+    "method": "POST",
+    "bodyStructure": {
+      "contentType": "json"
+    },
+    "connection": {
+      "id": "0857f1da-c58f-44b5-8db9-7738c6b39096",
+      "name": "UiPath GenAI Activities",
+      "elementInstanceId": 0,
+      "apiBaseUri": "",
+      "state": "enabled",
+      "isDefault": false,
+      "connector": {
+        "key": "uipath-uipath-airdk",
+        "name": "UiPath GenAI Activities",
+        "image": "https://cloud.uipath.com/elements_/scaleunit_/58cb4f17-4581-4130-a2ae-52448b37dc03/v3/element/elements/uipath-uipath-airdk/image",
+        "enabled": true,
+        "isPreview": false
+      },
+      "folder": {
+        "key": "e9d8fb14-9e45-432b-b389-06f8bddcfa63",
+        "path": "e9d8fb14-9e45-432b-b389-06f8bddcfa63"
+      },
+      "solutionProperties": {
+        "resourceKey": "0857f1da-c58f-44b5-8db9-7738c6b39096"
+      }
+    },
+    "parameters": [
+      {
+        "name": "modelName",
+        "displayName": "Model name",
+        "type": "string",
+        "fieldLocation": "query",
+        "value": "gpt-5.5-2026-04-23",
+        "description": "",
+        "position": "primary",
+        "sortOrder": -10,
+        "required": false,
+        "fieldVariant": "static",
+        "dynamic": true,
+        "isCascading": false,
+        "enumValues": null,
+        "loadReferenceOptionsByDefault": true,
+        "dynamicBehavior": [],
+        "reference": {
+          "objectName": "models",
+          "lookupNames": [
+            "displayName"
+          ],
+          "lookupValue": "model",
+          "path": "/getModels"
+        },
+        "displayValue": "gpt-5.5-2026-04-23 (OpenAI)"
+      },
+      {
+        "name": "prompt",
+        "displayName": "Text to summarize",
+        "type": "string",
+        "fieldLocation": "body",
+        "value": "{{prompt}}",
+        "description": "The full email body to summarize, taken from the emailContent input.",
+        "position": "primary",
+        "sortOrder": 7,
+        "required": true,
+        "fieldVariant": "dynamic",
+        "isCascading": false,
+        "dynamic": true,
+        "enumValues": null,
+        "loadReferenceOptionsByDefault": null,
+        "dynamicBehavior": [],
+        "reference": null
+      },
+      {
+        "name": "maxWordCount",
+        "displayName": "Number of summary words",
+        "type": "integer",
+        "fieldLocation": "body",
+        "value": "{{prompt}}",
+        "description": "150",
+        "position": "primary",
+        "sortOrder": 8,
+        "required": false,
+        "fieldVariant": "dynamic",
+        "isCascading": false,
+        "dynamic": true,
+        "enumValues": null,
+        "loadReferenceOptionsByDefault": null,
+        "dynamicBehavior": [],
+        "reference": null
+      },
+      {
+        "name": "detectInputLanguage",
+        "displayName": "Detect language for output",
+        "type": "boolean",
+        "fieldLocation": "body",
+        "value": "{{prompt}}",
+        "description": "",
+        "position": "secondary",
+        "sortOrder": 9,
+        "required": false,
+        "fieldVariant": "dynamic",
+        "isCascading": false,
+        "dynamic": true,
+        "enumValues": null,
+        "loadReferenceOptionsByDefault": null,
+        "dynamicBehavior": [],
+        "reference": null
+      },
+      {
+        "name": "summaryFormat",
+        "displayName": "Summary format",
+        "type": "string",
+        "fieldLocation": "body",
+        "value": "{{prompt}}",
+        "description": "\tBulleted list",
+        "position": "primary",
+        "sortOrder": 10,
+        "required": false,
+        "fieldVariant": "dynamic",
+        "isCascading": false,
+        "dynamic": true,
+        "enumValues": [
+          {
+            "value": "Paragraph"
+          },
+          {
+            "value": "Bulleted list"
+          },
+          {
+            "value": "Numbered list"
+          },
+          {
+            "value": "Outline"
+          },
+          {
+            "value": "Tabular"
+          },
+          {
+            "value": "Chronological"
+          }
+        ],
+        "loadReferenceOptionsByDefault": null,
+        "dynamicBehavior": [],
+        "reference": null
+      },
+      {
+        "name": "outputLanguage",
+        "displayName": "Output language",
+        "type": "string",
+        "fieldLocation": "body",
+        "value": "{{prompt}}",
+        "description": "",
+        "position": "secondary",
+        "sortOrder": 11,
+        "required": false,
+        "fieldVariant": "dynamic",
+        "isCascading": false,
+        "dynamic": true,
+        "enumValues": [
+          {
+            "value": "Afrikaans"
+          },
+          {
+            "value": "Amharic"
+          },
+          {
+            "value": "Arabic"
+          },
+          {
+            "value": "Assamese"
+          },
+          {
+            "value": "Azerbaijani"
+          },
+          {
+            "value": "Bulgarian"
+          },
+          {
+            "value": "Bengali"
+          },
+          {
+            "value": "Bosnian"
+          },
+          {
+            "value": "Catalan"
+          },
+          {
+            "value": "Czech"
+          },
+          {
+            "value": "Welsh"
+          },
+          {
+            "value": "Danish"
+          },
+          {
+            "value": "German"
+          },
+          {
+            "value": "Greek"
+          },
+          {
+            "value": "English"
+          },
+          {
+            "value": "Spanish"
+          },
+          {
+            "value": "Estonian"
+          },
+          {
+            "value": "Basque"
+          },
+          {
+            "value": "Persian"
+          },
+          {
+            "value": "Finnish"
+          },
+          {
+            "value": "French"
+          },
+          {
+            "value": "Irish"
+          },
+          {
+            "value": "Galician"
+          },
+          {
+            "value": "Gujarati"
+          },
+          {
+            "value": "Hebrew"
+          },
+          {
+            "value": "Hindi"
+          },
+          {
+            "value": "Croatian"
+          },
+          {
+            "value": "Hungarian"
+          },
+          {
+            "value": "Armenian"
+          },
+          {
+            "value": "Italian"
+          },
+          {
+            "value": "Indonesian"
+          },
+          {
+            "value": "Japanese"
+          },
+          {
+            "value": "Georgian"
+          },
+          {
+            "value": "Kazakh"
+          },
+          {
+            "value": "Khmer"
+          },
+          {
+            "value": "Kannada"
+          },
+          {
+            "value": "Korean"
+          },
+          {
+            "value": "Kurdish (Kurmanji)"
+          },
+          {
+            "value": "Kyrgyz"
+          },
+          {
+            "value": "Lao"
+          },
+          {
+            "value": "Lithuanian"
+          },
+          {
+            "value": "Latvian"
+          },
+          {
+            "value": "Malagasy"
+          },
+          {
+            "value": "Macedonian"
+          },
+          {
+            "value": "Malayalam"
+          },
+          {
+            "value": "Mongolian"
+          },
+          {
+            "value": "Marathi"
+          },
+          {
+            "value": "Malay"
+          },
+          {
+            "value": "Burmese"
+          },
+          {
+            "value": "Nepali"
+          },
+          {
+            "value": "Dutch"
+          },
+          {
+            "value": "Norwegian (Bokmål)"
+          },
+          {
+            "value": "Odia"
+          },
+          {
+            "value": "Punjabi"
+          },
+          {
+            "value": "Polish"
+          },
+          {
+            "value": "Pashto"
+          },
+          {
+            "value": "Portuguese (Brazil)"
+          },
+          {
+            "value": "Portuguese (Portugal)"
+          },
+          {
+            "value": "Romanian"
+          },
+          {
+            "value": "Russian"
+          },
+          {
+            "value": "Slovak"
+          },
+          {
+            "value": "Slovenian"
+          },
+          {
+            "value": "Somali"
+          },
+          {
+            "value": "Albanian"
+          },
+          {
+            "value": "Serbian"
+          },
+          {
+            "value": "Swazi"
+          },
+          {
+            "value": "Swedish"
+          },
+          {
+            "value": "Swahili"
+          },
+          {
+            "value": "Tamil"
+          },
+          {
+            "value": "Telugu"
+          },
+          {
+            "value": "Thai"
+          },
+          {
+            "value": "Turkish"
+          },
+          {
+            "value": "Uyghur"
+          },
+          {
+            "value": "Ukrainian"
+          },
+          {
+            "value": "Urdu"
+          },
+          {
+            "value": "Uzbek"
+          },
+          {
+            "value": "Vietnamese"
+          },
+          {
+            "value": "Chinese"
+          }
+        ],
+        "loadReferenceOptionsByDefault": null,
+        "dynamicBehavior": [
+          {
+            "action": "show",
+            "priority": 0,
+            "conditions": [
+              {
+                "fieldName": "detectInputLanguage",
+                "values": [
+                  false
+                ],
+                "matchesWhenEmpty": false
+              }
+            ]
+          },
+          {
+            "action": "hide",
+            "priority": 0,
+            "conditions": [
+              {
+                "fieldName": "detectInputLanguage",
+                "values": [
+                  true
+                ],
+                "matchesWhenEmpty": true
+              }
+            ]
+          },
+          {
+            "action": "required",
+            "priority": 0,
+            "conditions": [
+              {
+                "fieldName": "detectInputLanguage",
+                "values": [
+                  false
+                ],
+                "matchesWhenEmpty": false
+              }
+            ]
+          },
+          {
+            "action": "optional",
+            "priority": 0,
+            "conditions": [
+              {
+                "fieldName": "detectInputLanguage",
+                "values": [
+                  true
+                ],
+                "matchesWhenEmpty": true
+              }
+            ]
+          }
+        ],
+        "reference": null
+      },
+      {
+        "name": "temperature",
+        "displayName": "Creativity",
+        "type": "number",
+        "fieldLocation": "body",
+        "value": "{{prompt}}",
+        "description": "",
+        "position": "secondary",
+        "sortOrder": 12,
+        "required": false,
+        "fieldVariant": "dynamic",
+        "isCascading": false,
+        "dynamic": true,
+        "enumValues": null,
+        "loadReferenceOptionsByDefault": null,
+        "dynamicBehavior": [],
+        "reference": null
+      }
+    ]
+  }
+}

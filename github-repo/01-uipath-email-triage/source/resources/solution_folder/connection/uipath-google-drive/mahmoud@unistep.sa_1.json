@@ -1,0 +1,29 @@
+{
+  "docVersion": "1.0.0",
+  "resource": {
+    "name": "mahmoud@unistep.sa_1",
+    "kind": "connection",
+    "type": "uipath-google-drive",
+    "apiVersion": "integrationservice.uipath.com/v1",
+    "isOverridable": true,
+    "dependencies": [],
+    "runtimeDependencies": [],
+    "files": [],
+    "folders": [
+      {
+        "fullyQualifiedName": "solution_folder"
+      }
+    ],
+    "spec": {
+      "connectorName": "Google Drive",
+      "name": "mahmoud@unistep.sa_1",
+      "description": null,
+      "authenticationType": "AuthenticateAfterDeployment",
+      "connectorVersion": "1.13.15",
+      "connectorKey": "uipath-google-drive",
+      "pollingInterval": 5
+    },
+    "locks": [],
+    "key": "4cdd8968-eeaf-4afc-b841-13abd7dd4429"
+  }
+}

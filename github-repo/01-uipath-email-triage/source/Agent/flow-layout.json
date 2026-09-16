@@ -1,0 +1,24 @@
+{
+  "zoom": 0.57,
+  "stickyNoteNodes": [],
+  "agentPosition": {
+    "x": 0,
+    "y": 0
+  },
+  "resourceNodes": [
+    {
+      "id": "agent=>New context:placeholder-context-1789456302957",
+      "position": {
+        "x": -64,
+        "y": 304
+      }
+    },
+    {
+      "id": "agent=>Summarize Text:96ae914f-5554-47ed-bab2-e4194c66dcfc",
+      "position": {
+        "x": 256,
+        "y": 304
+      }
+    }
+  ]
+}
