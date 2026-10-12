@@ -49,8 +49,8 @@ An n8n workflow that pulls farm sensor data, aggregates it in code, hands a clea
 │   ├── workflow.json                # importable n8n workflow (sanitized)
 │   └── sample-data/                 # 120 sensor records, CSV + XLSX
 └── docs/
-│   ├── Smart-Email-Triage-Agent-GUIDE-AR.md   # full build guide (Arabic)
-│   └── Video-Script-5min.md                   # demo script
+    ├── Smart-Email-Triage-Agent-GUIDE-AR.md   # full build guide (Arabic)
+    └── Video-Script-5min.md                   # demo script
 ```
 
 ---
